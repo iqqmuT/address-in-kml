@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <title>Alueen osoitteen tarkistus</title>
+    <style>
+      body { margin-top: 2rem; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1>Tarkista onko osoite Meri-Porin alueella</h1>
+          <form id="form">
+            <div class="input-group">
+              <input type="text" class="form-control" id="address" placeholder="Esimerkkikatu 1, Pori" minlength="5">
+              <button type="submit" class="btn btn-secondary">
+                <i class="bi-search"></i> Tarkista
+              </button>
+            </div>
+            <div class="form-text">
+              Esimerkki: "Soratie 23, Pori".
+              Muista lisätä kaupunki osoitteen perään.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="row result-row mt-3 mb-3">
+        <div class="col">
+          <div id="result-yes" class="alert alert-success" role="alert" style="display: none;">
+            <i class="bi-check-circle"></i>
+            Osoite <i><span class="result-address"></span></i> on Meri-Porin alueella!
+          </div>
+          <div id="result-no" class="alert alert-danger" role="alert" style="display: none;">
+            <i class="bi-x-circle"></i>
+            Osoite <i><span class="result-address"></span></i> <strong>ei</strong> ole Meri-Porin alueella.</strong>
+          </div>
+          <div id="result-invalid" class="alert alert-secondary" role="alert" style="display: none;">
+            <i class="bi-x-circle"></i>
+            Osoitetta <i><span class="result-address"></span></i> ei tunnistettu.
+            Tarkista, että se on kirjoitettu oikein ja että kaupunki on osoitteen perässä.
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
+    <script
+		  src="https://code.jquery.com/jquery-3.6.0.min.js"
+		  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+		  crossorigin="anonymous"></script>
+    <script>
+      function showAnswer(answer) {
+        $('.alert').hide();
+        $('#result-' + answer).show();
+      }
+
+      function checkAddress() {
+        $('.alert').hide();
+        var territory = '28761';
+        var address = $('#address').val();
+        var url = 'check.php?territory=' + territory + '&address=' + encodeURIComponent(address);
+        $.getJSON(url, function(data) {
+          if (data.address) {
+            $('.result-address').html(data.address);
+          } else {
+            $('.result-address').html(address);
+          }
+          if (data && data.result === null) {
+            showAnswer('invalid');
+          } else if (data && data.result) {
+            showAnswer('yes');
+          } else {
+            showAnswer('no');
+          }
+        });
+      }
+
+      $(document).ready(function() {
+        $('#form').on('submit', function(evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+          checkAddress();
+        });
+      });
+    </script>
+  </body>
+</html>
