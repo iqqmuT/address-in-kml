@@ -45,6 +45,15 @@
             Osoitetta <i><span class="result-address"></span></i> ei tunnistettu.
             Tarkista, että se on kirjoitettu oikein ja että kaupunki on osoitteen perässä.
           </div>
+          <div id="result-error" class="alert alert-danger" role="alert" style="display: none;">
+            <i class="bi-exclamation-circle"></i>
+            Palvelussa tapahtui virhe. Yritä myöhemmin uudelleen.
+          </div>
+          <div id="result-quota" class="alert alert-warning" role="alert" style="display: none;">
+            <i class="bi-hourglass"></i>
+            Palvelun päivittäinen käyttökiintiö on täynnä.
+            Yritä huomenna uudelleen.
+          </div>
         </div>
       </div>
     </div>
@@ -74,7 +83,13 @@
             $('.result-address').html(address);
           }
           if (data && data.result === null) {
-            showAnswer('invalid');
+            if (data.status === 'OVER_QUERY_LIMIT') {
+              showAnswer('quota');
+            } else if (data.status === 'ZERO_RESULTS') {
+              showAnswer('invalid');
+            } else {
+              showAnswer('error');
+            }
           } else if (data && data.result) {
             showAnswer('yes');
           } else {
